@@ -95,7 +95,10 @@ void Prim(nodePointer *G, int start) {
     int heapSize = 0;
 
     for (nodePointer p = G[start]; p != NULL; p = p->link) {
-        edge e = {start, p->vertex, p->weight};
+        edge e;
+        e.lend = start;
+        e.rend = p->vertex;
+        e.weight = p->weight;
         insert(e, &heapSize);
     }
 
@@ -109,8 +112,11 @@ void Prim(nodePointer *G, int start) {
             count++;
 
             for (nodePointer p = G[e.rend]; p != NULL; p = p->link) {
-                edge ne = {e.rend, p->vertex, p->weight};
-                insert(ne, &heapSize);
+                edge newEdge;
+                newEdge.lend = e.rend;
+                newEdge.rend = p->vertex;
+                newEdge.weight = p->weight;
+                insert(newEdge, &heapSize);
             }
         }
     }
@@ -127,7 +133,7 @@ void Prim(nodePointer *G, int start) {
 
 void insert(edge e, int *n) {
     int i = ++(*n);
-    while ((i != 1) && (e.weight < heap[i / 2].weight)) {
+    while ((i != 1) && (e.weight < heap[i/2].weight)) {
         heap[i] = heap[i / 2];
         i /= 2;
     }
@@ -135,20 +141,27 @@ void insert(edge e, int *n) {
 }
 
 edge delete(int *n) {
-    edge item = heap[1];
-    edge last = heap[(*n)--];
-    int parent = 1, child = 2;
+    int parent, child;
+    edge item, temp;
+    if (HEAP_EMPTY(*n)) {
+        fprintf(stderr, "The heap is empty");
+        exit(1);
+    }
+    item = heap[1];
+    temp = heap[(*n)--];
+    parent = 1;
+    child = 2;
 
     while (child <= *n) {
         if ((child < *n) && (heap[child].weight > heap[child + 1].weight))
             child++;
-        if (last.weight <= heap[child].weight)
+        if (temp.weight <= heap[child].weight)
             break;
         heap[parent] = heap[child];
         parent = child;
         child *= 2;
     }
-    heap[parent] = last;
+    heap[parent] = temp;
     return item;
 }
 

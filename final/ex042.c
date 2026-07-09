@@ -87,6 +87,20 @@ void bfs(int v) {
     } 
 }
 
+void iter_bfs(int v) {
+  addq(&front, &rear, v);
+  while(front){
+    v = deleteq(&front);
+    if(!visited[v]) {
+      visited[v] = TRUE;
+      printf("%5d", v);
+      for (nodePointer w = graph[v]; w; w=w->link) {
+        addq(&front, &rear, w->vertex);
+      }
+    }
+  }
+}
+
 void main() {
 
     nodePointer prev;
@@ -129,8 +143,10 @@ void main() {
     np = (nodePointer)malloc(sizeof(struct node)); np->vertex = 6; np->link = NULL; prev->link = np;
 
     for(int i=0; i<8; i++) visited[i] = 0;
-    
     bfs(0);
+    printf("\n");
+    for(int i=0; i<8; i++) visited[i] = 0;
+    iter_bfs(0);
     printf("\n");
 }
 
