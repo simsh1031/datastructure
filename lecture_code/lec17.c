@@ -57,4 +57,65 @@ treePointer modifiedSearch(treePointer node, int k) {
     return parent;
 }
 
+/* delete the node whose key is k */
 void deleteNode(treePointer *node, int k)
+{
+    treePointer parent = NULL;
+    treePointer curr = *node;
+
+    /* ---------- Case 1 : node does not exist ---------- */
+    while (curr && curr->data.key != k) {
+        parent = curr;
+
+        if (k < curr->data.key)
+            curr = curr->leftChild;
+        else
+            curr = curr->rightChild;
+    }
+
+    if (!curr)
+        return;
+
+    /* ---------- Case 4 : node has two children ---------- */
+    if (curr->leftChild && curr->rightChild) {
+
+        treePointer replaceParent = curr;
+        treePointer replace = curr->leftChild;
+
+        /* largest node in left subtree */
+        while (replace->rightChild) {
+            replaceParent = replace;
+            replace = replace->rightChild;
+        }
+
+        /* copy key */
+        curr->data = replace->data;
+
+        /* now delete replacement node */
+        parent = replaceParent;
+        curr = replace;
+    }
+
+    /* ---------- Case 2 & 3 ---------- */
+
+    treePointer child;
+
+    if (curr->leftChild)
+        child = curr->leftChild;
+    else
+        child = curr->rightChild;
+
+    /* deleting root */
+    if (parent == NULL)
+        *node = child;
+
+    /* left child of parent */
+    else if (parent->leftChild == curr)
+        parent->leftChild = child;
+
+    /* right child of parent */
+    else
+        parent->rightChild = child;
+
+    free(curr);
+}
